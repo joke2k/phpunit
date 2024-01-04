@@ -73,6 +73,7 @@ final readonly class Builder
         'include-path=',
         'list-groups',
         'list-suites',
+        'list-test-files',
         'list-tests',
         'list-tests-xml=',
         'log-junit=',
@@ -213,6 +214,7 @@ final readonly class Builder
         $junitLogfile                      = null;
         $listGroups                        = false;
         $listSuites                        = false;
+        $listTestFiles                     = false;
         $listTests                         = false;
         $listTestsXml                      = null;
         $noCoverage                        = null;
@@ -443,6 +445,11 @@ final readonly class Builder
 
                 case '--list-suites':
                     $listSuites = true;
+
+                    break;
+
+                case '--list-test-files':
+                    $listTestFiles = true;
 
                     break;
 
@@ -906,6 +913,7 @@ final readonly class Builder
             $junitLogfile,
             $listGroups,
             $listSuites,
+            $listTestFiles,
             $listTests,
             $listTestsXml,
             $noCoverage,
