@@ -15,10 +15,9 @@ use function explode;
 use function getcwd;
 use function is_file;
 use function is_numeric;
-use function realpath;
 use function sprintf;
-use function str_starts_with;
 use PHPUnit\Runner\TestSuiteSorter;
+use PHPUnit\Util\Filesystem;
 use SebastianBergmann\CliParser\Exception as CliParserException;
 use SebastianBergmann\CliParser\Parser as CliParser;
 
@@ -124,6 +123,7 @@ final readonly class Builder
         'log-events-text=',
         'log-events-verbose-text=',
         'version',
+        'debug',
     ];
     private const SHORT_OPTIONS = 'd:c:h';
 
@@ -242,6 +242,7 @@ final readonly class Builder
         $logEventsVerboseText              = null;
         $printerTeamCity                   = null;
         $printerTestDox                    = null;
+        $debug                             = false;
 
         foreach ($options[0] as $option) {
             switch ($option[0]) {
@@ -805,38 +806,35 @@ final readonly class Builder
                     break;
 
                 case '--log-events-text':
-                    if (str_starts_with($option[1], 'php://') || str_starts_with($option[1], 'socket://')) {
-                        $logEventsText = $option[1];
-                    } else {
-                        $logEventsText = realpath($option[1]);
+                    $logEventsText = Filesystem::resolvePathOrStream($option[1]);
 
-                        if (!$logEventsText) {
-                            throw new Exception(
-                                sprintf(
-                                    'The path "%s" specified for the --log-events-text option could not be resolved',
-                                    $option[1],
-                                ),
-                            );
-                        }
+                    if (!$logEventsText) {
+                        throw new Exception(
+                            sprintf(
+                                'The path "%s" specified for the --log-events-text option could not be resolved',
+                                $option[1],
+                            ),
+                        );
                     }
 
                     break;
 
                 case '--log-events-verbose-text':
-                    if (str_starts_with($option[1], 'php://') || str_starts_with($option[1], 'socket://')) {
-                        $logEventsVerboseText = $option[1];
-                    } else {
-                        $logEventsVerboseText = realpath($option[1]);
+                    $logEventsVerboseText = Filesystem::resolvePathOrStream($option[1]);
 
-                        if (!$logEventsVerboseText) {
-                            throw new Exception(
-                                sprintf(
-                                    'The path "%s" specified for the --log-events-verbose-text option could not be resolved',
-                                    $option[1],
-                                ),
-                            );
-                        }
+                    if (!$logEventsVerboseText) {
+                        throw new Exception(
+                            sprintf(
+                                'The path "%s" specified for the --log-events-verbose-text option could not be resolved',
+                                $option[1],
+                            ),
+                        );
                     }
+
+                    break;
+
+                case '--debug':
+                    $debug = true;
 
                     break;
             }
@@ -948,6 +946,7 @@ final readonly class Builder
             $logEventsVerboseText,
             $printerTeamCity,
             $printerTestDox,
+            $debug,
         );
     }
 }
